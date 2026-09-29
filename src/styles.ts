@@ -16,13 +16,32 @@ export const STYLES: string = /* css */ `
   align-items: center;
 }
 
-/* The stage keeps 15% of transparent room around the sphere for the halo,
-   so nothing ever sticks out of the element (no stray page scrollbars). */
+/* The stage keeps 15% of transparent room around the sphere for the voice
+   pulse, so the canvas never sticks out of the element (no stray scrollbars). */
 .stage {
   position: relative;
   width: calc(var(--_size) * 1.3);
   max-width: 100%;
   aspect-ratio: 1 / 1;
+}
+
+/* Soft light around the sphere while it listens and speaks. A blurred
+   box-shadow: smooth, cheap to animate (opacity), and it never creates scrollbars.
+   The disc is a bit smaller than the sphere, so the light starts right under its edge. */
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72.3%;
+  height: 72.3%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  will-change: opacity, transform;
+  box-shadow:
+    0 0 calc(var(--_size) * 0.16) calc(var(--_size) * 0.03) var(--_glow-in, rgba(63, 230, 255, 0.5)),
+    0 0 calc(var(--_size) * 0.6) calc(var(--_size) * 0.07) var(--_glow-out, rgba(53, 156, 255, 0.32));
 }
 
 canvas {

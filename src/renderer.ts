@@ -9,13 +9,12 @@ export interface FrameParams {
   offset: number;
   ripple: number;
   energy: number;
-  halo: number;
   /** Sphere radius relative to half of the canvas. */
   radius: number;
 }
 
 const UNIFORMS = [
-  'uRes', 'uRadius', 'uTime', 'uFrame', 'uAmp', 'uOffset', 'uRipple', 'uEnergy', 'uHalo',
+  'uRes', 'uRadius', 'uTime', 'uFrame', 'uAmp', 'uOffset', 'uRipple', 'uEnergy',
   'uDeep', 'uBody', 'uGlow', 'uAccent', 'uRim',
 ] as const;
 type UniformName = (typeof UNIFORMS)[number];
@@ -87,7 +86,6 @@ export class SphereRenderer {
     gl.uniform1f(l.uOffset, p.offset);
     gl.uniform1f(l.uRipple, p.ripple);
     gl.uniform1f(l.uEnergy, p.energy);
-    gl.uniform1f(l.uHalo, p.halo);
     for (const role of COLOR_ROLES) {
       const c = this.colors[role];
       if (c) gl.uniform3f(l[COLOR_UNIFORM[role]], c[0], c[1], c[2]);

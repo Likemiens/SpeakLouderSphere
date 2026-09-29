@@ -7,7 +7,6 @@ export interface FrameParams {
     offset: number;
     ripple: number;
     energy: number;
-    halo: number;
     /** Sphere radius relative to half of the canvas. */
     radius: number;
 }

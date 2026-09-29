@@ -8,7 +8,7 @@
  *   - under the sheet: a hot `glow` colour right at the fold, cooling to `body` blue;
  *   - over the sheet:  `body` blue drifting into the `accent` colour;
  *   - whichever side faces the viewer shines brighter.
- * A frosted glass rim and an optional voice-driven halo finish it off.
+ * A frosted glass rim finishes it off; the outer glow is a soft CSS shadow (see styles.ts).
  * It is a handful of sin() calls per pixel, so it runs fine on phones too.
  */
 export declare const VERTEX_SHADER: string;

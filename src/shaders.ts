@@ -8,7 +8,7 @@
  *   - under the sheet: a hot `glow` colour right at the fold, cooling to `body` blue;
  *   - over the sheet:  `body` blue drifting into the `accent` colour;
  *   - whichever side faces the viewer shines brighter.
- * A frosted glass rim and an optional voice-driven halo finish it off.
+ * A frosted glass rim finishes it off; the outer glow is a soft CSS shadow (see styles.ts).
  * It is a handful of sin() calls per pixel, so it runs fine on phones too.
  */
 
@@ -34,7 +34,6 @@ uniform float uAmp;      // sheet wave amplitude
 uniform float uOffset;   // sheet height
 uniform float uRipple;   // fine ripples (high frequencies of the voice)
 uniform float uEnergy;   // overall brightness of the light inside
-uniform float uHalo;     // outer glow (only while there is sound)
 uniform vec3 uDeep;      // colours, linear RGB
 uniform vec3 uBody;
 uniform vec3 uGlow;
@@ -82,13 +81,6 @@ void main() {
   float px = 2.0 / (minRes * uRadius);   // one pixel in sphere units
   float dither = hash12(gl_FragCoord.xy);
 
-  // ---- outer halo (voice feedback) ----------------------------------------
-  float edgeR = 1.0 / uRadius;            // canvas edge in sphere units
-  float d0 = max(r - 1.0, 0.0);
-  float haloAmt = uHalo * (0.75 * exp(-d0 * 30.0) + 0.25 * exp(-d0 * 9.0));
-  haloAmt *= 1.0 - smoothstep(1.0 + (edgeR - 1.0) * 0.55, edgeR, r);
-  vec3 haloLin = mix(uRim, uGlow, 0.4) * haloAmt;
-
   // ---- the ball -------------------------------------------------------------
   float cov = 1.0 - smoothstep(1.0 - px, 1.0 + px, r);
   vec3 ball = vec3(0.0);
@@ -129,13 +121,8 @@ void main() {
     ball = toSRGB(tonemap(acc + uRim * rim) + base);
   }
 
-  vec3 haloS = toSRGB(tonemap(haloLin));
-  float haloA = max(haloS.r, max(haloS.g, haloS.b));
-
-  // Premultiplied alpha: the ball is opaque, the halo is light on a transparent background.
-  vec3 rgb = ball * cov + haloS * (1.0 - cov);
-  float a = cov + haloA * (1.0 - cov);
-  rgb += (dither - 0.5) / 255.0;
-  gl_FragColor = vec4(clamp(rgb, 0.0, 1.0) * step(0.002, a), a);
+  // Premultiplied alpha: the ball is opaque, everything around it transparent.
+  vec3 rgb = clamp(ball + (dither - 0.5) / 255.0, 0.0, 1.0);
+  gl_FragColor = vec4(rgb * cov, cov);
 }
 `;

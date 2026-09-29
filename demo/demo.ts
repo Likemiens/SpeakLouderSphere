@@ -176,7 +176,9 @@ function snippet(): string {
 
   const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const lines = attrs.map(([k, v]) => `  ${k}="${esc(v)}"`).join('\n');
-  return `<script src="speak-louder-sphere.iife.js"></script>\n\n<speak-louder-sphere\n${lines}\n></speak-louder-sphere>`;
+  // The widget file is published next to this page (e.g. on Vercel), so the snippet works on any site.
+  const src = new URL('/dist/speak-louder-sphere.iife.js', location.href).href;
+  return `<script src="${src}"></script>\n\n<speak-louder-sphere\n${lines}\n></speak-louder-sphere>`;
 }
 
 $('copy').addEventListener('click', async () => {

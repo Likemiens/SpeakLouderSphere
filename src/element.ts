@@ -22,7 +22,7 @@ export interface TranscriptDetail {
   isFinal: boolean;
 }
 
-/** The canvas (stage) is larger than the sphere so that the halo is not clipped. */
+/** The canvas (stage) is larger than the sphere: room for the voice pulse. */
 const CANVAS_SCALE = 1.3;
 const DPR_CAP: Record<Exclude<SphereQuality, 'auto'>, number> = { low: 1, medium: 1.5, high: 2 };
 const DOWNGRADE: Record<Exclude<SphereQuality, 'auto'>, Exclude<SphereQuality, 'auto'>> = {
@@ -48,6 +48,7 @@ const TEMPLATE = `
 <style>${STYLES}</style>
 <div class="root" part="root">
   <div class="stage" part="stage">
+    <div class="glow" part="glow" aria-hidden="true"></div>
     <canvas part="canvas" aria-hidden="true"></canvas>
     <div class="fallback" part="fallback" hidden></div>
     <button type="button" part="button" aria-pressed="false"></button>
@@ -69,6 +70,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
   private readonly stage: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private readonly fallback: HTMLDivElement;
+  private readonly glow: HTMLDivElement;
   private readonly button: HTMLButtonElement;
   private readonly captionBox: HTMLDivElement;
   private readonly status: HTMLDivElement;
@@ -100,6 +102,8 @@ export class SpeakLouderSphereElement extends HTMLElement {
   private pressed = false;
   private pulse = 0;
   private pulseV = 0;
+  private glowLevel = 0;
+  private glowShown = -1;
   private perfTime = 0;
   private perfSlow = 0;
   private readonly matrix = new Float32Array(9);
@@ -107,6 +111,8 @@ export class SpeakLouderSphereElement extends HTMLElement {
     typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   private resizeObserver: ResizeObserver | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
+  private hostWidth = -1;
+  private refitRaf = 0;
 
   // Caption state.
   private phrase = '';
@@ -126,6 +132,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
     this.stage = $('.stage');
     this.canvas = $('canvas');
     this.fallback = $('.fallback');
+    this.glow = $('.glow');
     this.button = $('button');
     this.captionBox = $('.caption');
     this.status = $('.sr');
@@ -315,8 +322,14 @@ export class SpeakLouderSphereElement extends HTMLElement {
     this.setupRenderer();
     this.button.setAttribute('aria-label', message(this.speechLang, 'start'));
 
-    this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === this.stage) this.resizeCanvas();
+        else this.onHostResize(entry.contentRect.width);
+      }
+    });
     this.resizeObserver.observe(this.stage);
+    this.resizeObserver.observe(this);
     this.intersectionObserver = new IntersectionObserver((entries) => {
       this.onScreen = entries.some((e) => e.isIntersecting);
       this.updateLoop();
@@ -339,6 +352,8 @@ export class SpeakLouderSphereElement extends HTMLElement {
     this.removeAttribute('listening');
     this.stopLoop();
     this.resizeObserver?.disconnect();
+    this.hostWidth = -1;
+    cancelAnimationFrame(this.refitRaf);
     this.intersectionObserver?.disconnect();
     document.removeEventListener('visibilitychange', this.updateLoop);
     this.renderer?.dispose();
@@ -431,6 +446,11 @@ export class SpeakLouderSphereElement extends HTMLElement {
     this.rgb = resolveColors(this.getAttribute('preset'), fromAttrs, this.colorOverrides);
     this.renderer?.setColors(this.rgb);
     for (const role of COLOR_ROLES) this.rootEl.style.setProperty(`--_${role}`, toHex(this.rgb[role]));
+    const rgba = ([r, g, b]: RGB, a: number) => `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a})`;
+    const { glow, body } = this.rgb;
+    const mixed: RGB = [0, 1, 2].map((i) => body[i] * 0.6 + glow[i] * 0.4) as RGB;
+    this.rootEl.style.setProperty('--_glow-in', rgba(glow, 0.5));
+    this.rootEl.style.setProperty('--_glow-out', rgba(mixed, 0.32));
   }
 
   private applyLayout(): void {
@@ -473,6 +493,14 @@ export class SpeakLouderSphereElement extends HTMLElement {
     this.renderer.resize(px, px);
   }
 
+  /** The available width changed: let a long transcript show more or fewer words. */
+  private onHostResize(width: number): void {
+    if (Math.abs(width - this.hostWidth) < 1) return;
+    this.hostWidth = width;
+    cancelAnimationFrame(this.refitRaf);
+    this.refitRaf = requestAnimationFrame(() => this.captions.refit());
+  }
+
   private setSource(next: SphereSource): void {
     if (this.src === next) return;
     const wasListening = this.src === 'microphone';
@@ -491,8 +519,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
   private startTranscriber(): void {
     if (!this.captionsEnabled) return;
     if (!SpeechTranscriber.supported) {
-      this.showNotice('noSpeech', 'hint', 5000);
-      this.emit('sls-error', { code: 'speech-unsupported', message: message(this.speechLang, 'noSpeech') });
+      this.report('speech-unsupported', 'noSpeech', 'hint');
       return;
     }
     const t = (this.transcriber ??= new SpeechTranscriber());
@@ -507,8 +534,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
             : code === 'audio-capture'
               ? 'noMic'
               : 'network';
-      this.showNotice(key, 'error', 4500);
-      this.emit('sls-error', { code: `speech-${code}`, message: message(this.speechLang, key) });
+      this.report(`speech-${code}`, key, 'error');
     };
     t.start();
   }
@@ -521,13 +547,25 @@ export class SpeakLouderSphereElement extends HTMLElement {
         : name === 'InsecureContextError'
           ? 'insecure'
           : 'noMic';
-    this.showNotice(key, 'error', 4500);
-    this.emit('sls-error', { code: `mic-${name || 'error'}`, message: message(this.speechLang, key), error: err });
+    this.report(`mic-${name || 'error'}`, key, 'error', err);
   }
 
-  private showNotice(key: MessageKey, kind: 'hint' | 'error', ms: number): void {
-    this.notice = { text: message(this.speechLang, key), kind };
-    this.status.textContent = this.notice.text;
+  /**
+   * Problems go to the console and an `sls-error` event (and to screen readers).
+   * They appear under the sphere only with the `show-errors` attribute.
+   */
+  private report(code: string, key: MessageKey, kind: 'hint' | 'error', error?: unknown): void {
+    const text = message(this.speechLang, key);
+    const log = kind === 'error' ? console.warn : console.info;
+    if (error) log(`[speak-louder-sphere] ${code}: ${text}`, error);
+    else log(`[speak-louder-sphere] ${code}: ${text}`);
+    this.status.textContent = text;
+    this.emit('sls-error', { code, message: text, error });
+    if (this.flag('show-errors')) this.showNotice(text, kind, kind === 'error' ? 4500 : 5000);
+  }
+
+  private showNotice(text: string, kind: 'hint' | 'error', ms: number): void {
+    this.notice = { text, kind };
     clearTimeout(this.noticeTimer);
     this.swapCaption();
     this.noticeTimer = window.setTimeout(() => {
@@ -609,6 +647,16 @@ export class SpeakLouderSphereElement extends HTMLElement {
 
     const T = this.time;
     const pulseScale = 1 + 0.045 * this.pulse * reduce;
+
+    // Soft outer light: faint while listening, blooming with the voice.
+    const glowTarget = Math.min(1, 0.3 * this.listen + 0.12 * this.hover + 0.85 * f.level);
+    this.glowLevel += (glowTarget - this.glowLevel) * k(0.12);
+    if (Math.abs(this.glowLevel - this.glowShown) > 0.003) {
+      this.glowShown = this.glowLevel;
+      this.glow.style.opacity = this.glowLevel.toFixed(3);
+      this.glow.style.transform = `translate(-50%, -50%) scale(${pulseScale.toFixed(4)})`;
+    }
+
     if (!this.renderer) {
       this.fallback.style.setProperty('--_pulse', pulseScale.toFixed(4));
       return;
@@ -620,8 +668,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
       amp: 0.3 + 0.05 * Math.sin(0.37 * T) + 0.12 * f.level + 0.06 * f.low,
       offset: -0.05 + 0.1 * Math.sin(0.29 * T + 0.4),
       ripple: 0.045 * f.high + 0.012 * f.level,
-      energy: (0.94 + 0.06 * Math.sin(wall * 1.3)) * (1 + 0.55 * f.level + 0.2 * f.mid) * (1 + 0.08 * this.listen + 0.08 * this.hover),
-      halo: 0.2 * f.level + 0.03 * this.listen,
+      energy: (0.94 + 0.06 * Math.sin(wall * 1.3)) * (1 + 0.3 * f.level + 0.1 * f.mid) * (1 + 0.08 * this.listen + 0.08 * this.hover),
       radius: pulseScale / CANVAS_SCALE,
     });
   }

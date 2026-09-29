@@ -22,6 +22,7 @@ export declare class SpeakLouderSphereElement extends HTMLElement {
     private readonly stage;
     private canvas;
     private readonly fallback;
+    private readonly glow;
     private readonly button;
     private readonly captionBox;
     private readonly status;
@@ -49,12 +50,16 @@ export declare class SpeakLouderSphereElement extends HTMLElement {
     private pressed;
     private pulse;
     private pulseV;
+    private glowLevel;
+    private glowShown;
     private perfTime;
     private perfSlow;
     private readonly matrix;
     private readonly reducedMotion;
     private resizeObserver;
     private intersectionObserver;
+    private hostWidth;
+    private refitRaf;
     private phrase;
     private interim;
     private override;
@@ -115,9 +120,16 @@ export declare class SpeakLouderSphereElement extends HTMLElement {
     private pickQuality;
     private setupRenderer;
     private resizeCanvas;
+    /** The available width changed: let a long transcript show more or fewer words. */
+    private onHostResize;
     private setSource;
     private startTranscriber;
     private onMicError;
+    /**
+     * Problems go to the console and an `sls-error` event (and to screen readers).
+     * They appear under the sphere only with the `show-errors` attribute.
+     */
+    private report;
     private showNotice;
     /** Fade the caption out, update it, fade back in. */
     private swapCaption;

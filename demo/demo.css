@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
 }
 
 .topbar {
@@ -58,15 +58,6 @@ speak-louder-sphere {
   --sls-font-size: clamp(17px, 2.1vw, 28px);
   --sls-caption-max-width: min(92vw, 760px);
   color: var(--fg);
-}
-
-.footnote {
-  margin: 0;
-  padding: 0 20px max(18px, env(safe-area-inset-bottom));
-  text-align: center;
-  font-size: 13px;
-  color: var(--fg);
-  opacity: 0.4;
 }
 
 .pill {
