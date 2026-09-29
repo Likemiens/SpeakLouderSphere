@@ -3,6 +3,8 @@
 Светящаяся стеклянная сфера, которая **реагирует на голос** и показывает **живые субтитры** того, что вы говорите.
 Готовый веб-компонент `<speak-louder-sphere>`: вставляется на любой сайт одним тегом, без зависимостей.
 
+**Демо:** <https://speak-louder-sphere.vercel.app> (панель «Настроить» справа сверху собирает код для вставки).
+
 - **Сфера на WebGL.** Тёмное стекло, внутри медленно изгибается светящаяся мембрана: голубая снизу, синяя с фиолетовым переливом сверху.
 - **Реакция на голос в реальном времени.** Громкость и частоты с микрофона (Web Audio API). Сфера разгорается, мембрана ускоряется и волнуется, вокруг появляется мягкое свечение, размер слегка «дышит» в такт слогам.
 - **Живые субтитры** (Web Speech API). Слова появляются по мере речи и уточняются на лету. После паузы фраза плавно гаснет, длинные фразы не вылезают за 2 строки.
@@ -27,11 +29,10 @@ npm run dev
 
 ## Встраивание на сайт
 
-1. Возьмите готовый файл `dist/speak-louder-sphere.iife.js` (или пересоберите: `npm run build`) и положите его на свой сайт.
-2. Добавьте на страницу:
+Проще всего подключить файл прямо с Vercel:
 
 ```html
-<script src="/assets/speak-louder-sphere.iife.js"></script>
+<script src="https://speak-louder-sphere.vercel.app/dist/speak-louder-sphere.iife.js"></script>
 
 <speak-louder-sphere
   lang="ru-RU"
@@ -39,6 +40,8 @@ npm run dev
   listening-text="Слушаю…"
 ></speak-louder-sphere>
 ```
+
+Или скопируйте `dist/speak-louder-sphere.iife.js` к себе на сайт и укажите свой путь в `src`.
 
 Так же это работает в Tilda, WordPress, Webflow и других конструкторах: вставьте код в HTML-блок.
 
@@ -54,8 +57,6 @@ const sphere = createSphere('#assistant', { preset: 'aurora', size: 280, lang: '
 > **Важно.** Браузеры дают доступ к микрофону только на **HTTPS** (или `localhost`).
 > Если виджет стоит внутри `<iframe>`, добавьте ему `allow="microphone"`.
 
-Если сделать репозиторий публичным, файл можно подключать прямо с CDN:
-`https://cdn.jsdelivr.net/gh/Likemiens/SpeakLouderSphere@main/dist/speak-louder-sphere.iife.js`
 
 ## Атрибуты
 
@@ -198,4 +199,9 @@ dist/           готовые файлы для сайта
 |---|---|
 | `npm run dev` | демо с горячей перезагрузкой |
 | `npm run build` | проверка типов и сборка `dist/` (ES-модуль, файл для `<script>`, типы) |
+| `npm run build:site` | сборка сайта (демо, примеры и файлы виджета) в `site/` — её выполняет Vercel |
 | `npm run typecheck` | только проверка типов |
+
+## Публикация
+
+Проект подключён к Vercel (`likemiens-projects/speak-louder-sphere`): каждый push в `main` сам пересобирает и публикует <https://speak-louder-sphere.vercel.app>. Настройки сборки — в `vercel.json`.
