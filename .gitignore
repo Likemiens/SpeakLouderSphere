@@ -6,3 +6,6 @@ Thumbs.db
 .local/
 site/
 .vercel/
+
+.vercel
+.env*
