@@ -1,0 +1,39 @@
+{
+  "name": "speak-louder-sphere",
+  "version": "0.1.0",
+  "description": "Voice-reactive glowing glass sphere with live speech captions. Drop-in Web Component (WebGL + Web Audio + Web Speech API).",
+  "type": "module",
+  "private": true,
+  "main": "./dist/speak-louder-sphere.js",
+  "module": "./dist/speak-louder-sphere.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/speak-louder-sphere.js"
+    },
+    "./iife": "./dist/speak-louder-sphere.iife.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "web-component",
+    "webgl",
+    "voice",
+    "speech-recognition",
+    "audio-visualizer",
+    "orb",
+    "widget"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && tsc -p tsconfig.types.json",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

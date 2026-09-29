@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakLouderSphere — встраивание одним тегом</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; color: #fff; }
+      body {
+        display: grid;
+        place-items: center;
+        font-family: -apple-system, "SF Pro Text", "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+      }
+      speak-louder-sphere { --sls-font-size: clamp(17px, 2.4vw, 32px); }
+    </style>
+  </head>
+  <body>
+    <!-- 1. Один файл, без зависимостей. На своём сайте укажите путь к скопированному файлу. -->
+    <script src="../dist/speak-louder-sphere.iife.js"></script>
+
+    <!-- 2. Сам виджет — вставляется в любое место страницы. -->
+    <speak-louder-sphere
+      size="380"
+      lang="ru-RU"
+      text="Привет! Я NOVA, проводник в Миссию 2027"
+      listening-text="Слушаю…"
+    ></speak-louder-sphere>
+  </body>
+</html>

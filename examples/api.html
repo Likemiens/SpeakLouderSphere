@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakLouderSphere — JS API</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #05060a; color: #e9ecf5; }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; grid-template-columns: 1fr 360px; min-height: 100vh; }
+      main { display: grid; place-items: center; padding: 24px; }
+      aside { padding: 20px; border-left: 1px solid #1c2030; display: grid; gap: 10px; align-content: start; }
+      button { padding: 9px 12px; border-radius: 10px; border: 1px solid #2a3046; background: #121626; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+      button:hover { background: #1a2036; }
+      pre { margin: 0; padding: 10px; height: 260px; overflow: auto; background: #0b0d16; border-radius: 10px; font-size: 12px; white-space: pre-wrap; }
+      h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: #8b93ad; margin: 12px 0 0; }
+      @media (max-width: 800px) { body { grid-template-columns: 1fr; } aside { border-left: 0; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <speak-louder-sphere id="sphere" lang="ru-RU" text="Управляйте сферой кнопками справа" listening-text="Слушаю…"></speak-louder-sphere>
+    </main>
+    <aside>
+      <h2>Микрофон</h2>
+      <button id="start">sphere.start() — включить микрофон</button>
+      <button id="stop">sphere.stop() — выключить</button>
+      <h2>Без микрофона</h2>
+      <button id="simulate">sphere.simulate() — имитация речи</button>
+      <button id="reply">setCaption() + setLevel() — «ответ ассистента»</button>
+      <button id="stt">pushTranscript() — свой сервис распознавания</button>
+      <h2>Цвета</h2>
+      <button id="colors">setColors({ glow, accent })</button>
+      <button id="reset">setColors(null) — вернуть пресет</button>
+      <h2>События</h2>
+      <pre id="log"></pre>
+    </aside>
+
+    <script type="module">
+      import '../dist/speak-louder-sphere.js';
+
+      const sphere = document.getElementById('sphere');
+      const log = (line) => {
+        const el = document.getElementById('log');
+        el.textContent = `${new Date().toLocaleTimeString()}  ${line}\n` + el.textContent;
+      };
+
+      for (const type of ['sls-start', 'sls-stop', 'sls-transcript', 'sls-error', 'sls-sourcechange']) {
+        sphere.addEventListener(type, (e) => log(`${type} ${JSON.stringify(e.detail)}`));
+      }
+
+      const on = (id, fn) => document.getElementById(id).addEventListener('click', fn);
+      on('start', () => sphere.start());
+      on('stop', () => sphere.stop());
+      on('simulate', () => sphere.simulate(true));
+
+      // Imitates an assistant answering: the text appears under the sphere and the
+      // sphere "speaks" with a made-up loudness envelope. With real TTS audio use
+      // sphere.connectMediaElement(audioElement) instead of setLevel().
+      on('reply', () => {
+        sphere.setCaption('Конечно! Вот что я нашла по вашему запросу.');
+        const t0 = performance.now();
+        const tick = (now) => {
+          const t = (now - t0) / 1000;
+          if (t > 3.2) return sphere.setLevel(0);
+          sphere.setLevel(Math.max(0, Math.sin(t * 9) * 0.5 + 0.45) * (0.6 + 0.4 * Math.sin(t * 2.3)));
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+
+      // Plugging in any external speech-to-text: send interim hypotheses, then the final text.
+      on('stt', () => {
+        const words = 'так выглядят живые субтитры от внешнего сервиса распознавания речи'.split(' ');
+        words.forEach((_, i) => setTimeout(() => {
+          const last = i === words.length - 1;
+          const text = words.slice(0, i + 1).join(' ');
+          sphere.pushTranscript(last ? { final: text } : { interim: text });
+        }, 260 * i));
+      });
+
+      on('colors', () => sphere.setColors({ glow: '#ffb45e', accent: '#ff4d6d' }));
+      on('reset', () => sphere.setColors(null));
+    </script>
+  </body>
+</html>
