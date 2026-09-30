@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "A glowing sphere that reacts to your voice and shows live captions. Drop-in Web Component (WebGL + Web Audio + Web Speech API).",
   "license": "MIT",
-  "author": "Likemiens",
+  "author": {
+    "name": "Likemiens",
+    "url": "https://github.com/Likemiens"
+  },
   "homepage": "https://speak-louder-sphere.vercel.app",
   "repository": {
     "type": "git",

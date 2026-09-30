@@ -47,6 +47,26 @@ body {
 }
 .brand:hover { opacity: 1; }
 
+.brand-wrap { display: flex; align-items: center; gap: 12px; }
+.socials { display: flex; align-items: center; gap: 2px; }
+.socials a {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--fg);
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+.socials a:hover { opacity: 1; background: rgba(255, 255, 255, 0.08); }
+.socials svg { width: 15px; height: 15px; fill: currentColor; }
+
+@media (max-width: 520px) {
+  .brand-wrap { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .socials { margin-left: -7px; }
+}
+
 .actions { display: flex; align-items: center; gap: 10px; }
 
 .lang-switch {

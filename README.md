@@ -8,6 +8,13 @@
   <a href="#quick-start"><b>Quick start</b></a>
 </p>
 
+<p align="center">
+  Made by Likemiens ·
+  <a href="https://x.com/a_varantsov">X</a> ·
+  <a href="https://t.me/Likemiens">Telegram</a> ·
+  <a href="https://github.com/Likemiens">GitHub</a>
+</p>
+
 **SpeakLouderSphere** is a glowing glass sphere for your website. It reacts to your voice in real time and shows live captions of what you say.
 
 It is a single Web Component with no dependencies: add one `<script>` and one tag, and it works on any site.
@@ -198,6 +205,10 @@ dist/           ready-to-use files
 ```
 
 Every push to `main` deploys the demo to [speak-louder-sphere.vercel.app](https://speak-louder-sphere.vercel.app).
+
+## Author
+
+Made by **Likemiens**. Say hi or share what you built: [X](https://x.com/a_varantsov) · [Telegram](https://t.me/Likemiens) · [GitHub](https://github.com/Likemiens)
 
 ## License
 

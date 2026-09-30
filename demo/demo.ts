@@ -9,6 +9,7 @@ const UI = {
   en: {
     title: 'SpeakLouderSphere — voice-reactive sphere with live captions',
     langGroup: 'Interface language',
+    author: 'Author',
     customize: 'Customize',
     settings: 'Settings',
     close: 'Close',
@@ -47,6 +48,7 @@ const UI = {
   ru: {
     title: 'SpeakLouderSphere — сфера, которая слушает и показывает субтитры',
     langGroup: 'Язык интерфейса',
+    author: 'Автор',
     customize: 'Настроить',
     settings: 'Настройки',
     close: 'Закрыть',
