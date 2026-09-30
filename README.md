@@ -1,161 +1,145 @@
-# SpeakLouderSphere
+<p align="center">
+  <img src="docs/cover.png" alt="SpeakLouderSphere — a glowing sphere that reacts to your voice and shows live captions" width="100%">
+</p>
 
-Светящаяся стеклянная сфера, которая **реагирует на голос** и показывает **живые субтитры** того, что вы говорите.
-Готовый веб-компонент `<speak-louder-sphere>`: вставляется на любой сайт одним тегом, без зависимостей.
+<p align="center">
+  <a href="https://speak-louder-sphere.vercel.app"><b>Live demo</b></a> ·
+  <a href="docs/demo.mp4"><b>Video with sound</b></a> ·
+  <a href="#quick-start"><b>Quick start</b></a>
+</p>
 
-**Демо:** <https://speak-louder-sphere.vercel.app> (панель «Настроить» справа сверху собирает код для вставки).
+**SpeakLouderSphere** is a glowing glass sphere for your website. It reacts to your voice in real time and shows live captions of what you say.
 
-- **Сфера на WebGL.** Тёмное стекло, внутри медленно изгибается светящаяся мембрана: голубая снизу, синяя с фиолетовым переливом сверху.
-- **Реакция на голос в реальном времени.** Громкость и частоты с микрофона (Web Audio API). Сфера разгорается, мембрана ускоряется и волнуется, вокруг появляется мягкое свечение, размер слегка «дышит» в такт слогам.
-- **Живые субтитры** (Web Speech API). Слова появляются по мере речи и уточняются на лету. После паузы фраза плавно гаснет, длинные фразы не вылезают за 2 строки.
-- **Свои цвета.** 7 пресетов и 5 цветовых ролей, принимаются любые CSS-цвета.
-- **Встраивание.** Один файл (~13 КБ в gzip). Shadow DOM: стили сайта не ломают виджет, и наоборот.
-- **JS API и события.** Можно подключить голос ассистента (TTS, WebRTC), свой сервис распознавания речи или управлять сферой вручную.
-- **Бережно к устройству.** Вне экрана и в фоновой вкладке анимация на паузе, частота не выше 60 fps, на слабых устройствах качество снижается автоматически. Учитывается `prefers-reduced-motion`.
+It is a single Web Component with no dependencies: add one `<script>` and one tag, and it works on any site.
 
-## Быстрый старт
+<p align="center">
+  <img src="docs/demo.webp" alt="The sphere reacts to speech, captions appear word by word, then it changes colors" width="720">
+</p>
 
-```bash
-npm install
-npm run dev
-```
+## Features
 
-Откройте <http://localhost:5173>. Там демо в стиле референса и панель «Настроить» с пресетами, цветами, размером, чувствительностью, языком, имитацией речи и готовым кодом для вставки.
+- **Reacts to your voice.** The louder you speak, the brighter it glows. It pulses with every syllable.
+- **Live captions.** Your words appear under the sphere while you talk.
+- **One tag, any website.** One small file (~14 KB gzipped). No framework, no build step. Works with plain HTML, React, Vue, WordPress, Webflow, Tilda…
+- **Your colors.** 7 ready-made presets, or any CSS colors you like.
+- **Scriptable.** Let it speak with your AI assistant's voice, or plug in your own speech-to-text.
+- **Light on the device.** Pauses when off-screen, caps at 60 fps, respects "reduce motion".
 
-Ещё примеры (после `npm run build`):
+## Quick start
 
-- <http://localhost:5173/examples/embed.html>: встраивание одним тегом;
-- <http://localhost:5173/examples/api.html>: JS API, события, «ответ ассистента», внешний сервис распознавания.
-
-## Встраивание на сайт
-
-Проще всего подключить файл прямо с Vercel:
+Paste this anywhere in your HTML:
 
 ```html
-<script src="https://speak-louder-sphere.vercel.app/dist/speak-louder-sphere.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Likemiens/SpeakLouderSphere@v0.1.0/dist/speak-louder-sphere.iife.js"></script>
 
-<speak-louder-sphere
-  lang="ru-RU"
-  text="Привет! Я NOVA, проводник в Миссию 2027"
-  listening-text="Слушаю…"
-></speak-louder-sphere>
+<speak-louder-sphere text="Hi! Tap me and say something."></speak-louder-sphere>
 ```
 
-Или скопируйте `dist/speak-louder-sphere.iife.js` к себе на сайт и укажите свой путь в `src`.
+Open the page, tap the sphere, allow the microphone and start talking.
 
-Так же это работает в Tilda, WordPress, Webflow и других конструкторах: вставьте код в HTML-блок.
+> [!TIP]
+> Want to pick colors visually? Open the [live demo](https://speak-louder-sphere.vercel.app), press **Customize** and copy the ready-made code.
 
-Вариант с ES-модулем (для сборщиков):
+> [!NOTE]
+> Browsers only give microphone access on **HTTPS** pages (and on `localhost`). Inside an `<iframe>`, add `allow="microphone"`.
+
+### With a bundler
+
+```bash
+npm install github:Likemiens/SpeakLouderSphere
+```
 
 ```js
-import 'speak-louder-sphere';            // регистрирует <speak-louder-sphere>
-// или
-import { createSphere } from 'speak-louder-sphere';
-const sphere = createSphere('#assistant', { preset: 'aurora', size: 280, lang: 'ru-RU' });
+import 'speak-louder-sphere'; // registers <speak-louder-sphere>
 ```
 
-> **Важно.** Браузеры дают доступ к микрофону только на **HTTPS** (или `localhost`).
-> Если виджет стоит внутри `<iframe>`, добавьте ему `allow="microphone"`.
+## Options
 
+Everything is set with HTML attributes:
 
-## Атрибуты
-
-| Атрибут | По умолчанию | Что делает |
+| Attribute | Default | What it does |
 |---|---|---|
-| `preset` | `nova` | Палитра: `nova`, `aurora`, `amethyst`, `sunset`, `ember`, `ocean`, `mono` |
-| `color-deep`, `color-body`, `color-glow`, `color-accent`, `color-rim` | из пресета | Переопределяют отдельные цвета (любой CSS-цвет) |
-| `size` | `320` | Диаметр сферы: число в px или любая CSS-длина |
-| `lang` | язык страницы | Язык распознавания: `ru-RU`, `en-US`, `uk-UA`… |
-| `text` | — | Текст под сферой, пока микрофон выключен |
-| `listening-text` | — | Текст, пока микрофон включён и ещё ничего не сказано |
-| `captions` | включены | `captions="false"` выключает субтитры (сфера продолжает реагировать) |
-| `caption-lines` | `2` | Сколько строк субтитров показывать |
-| `caption-hold` | `2600` | Сколько миллисекунд держать фразу после паузы |
-| `sensitivity` | `1` | Чувствительность к громкости (0.1–5) |
-| `speed` | `1` | Скорость анимации (0 = стоп-кадр) |
-| `quality` | `auto` | `low`, `medium`, `high`: плотность пикселей холста |
-| `interactive` | `true` | `interactive="false"`: клик не включает микрофон (управление только из кода) |
-| `simulate` | — | Имитация речи, пока микрофон выключен (для витрин и превью) |
-| `show-errors` | — | Показывать ошибки (нет доступа к микрофону, нет связи с распознаванием) текстом под сферой. Без атрибута они уходят только в консоль и событие `sls-error` |
+| `lang` | page language | Speech recognition language: `en-US`, `es-ES`, `de-DE`, `ru-RU`… |
+| `text` | — | Text under the sphere while the microphone is off |
+| `listening-text` | — | Text while listening, before any words are heard |
+| `preset` | `nova` | Color preset: `nova`, `aurora`, `amethyst`, `sunset`, `ember`, `ocean`, `mono` |
+| `color-deep`, `color-body`, `color-glow`, `color-accent`, `color-rim` | from preset | Change single colors (any CSS color) |
+| `size` | `320` | Sphere diameter: a number (px) or any CSS length |
+| `captions` | on | `captions="false"` hides the captions (the sphere still reacts) |
+| `caption-lines` | `2` | How many lines of captions to show |
+| `caption-hold` | `2600` | How long a finished phrase stays on screen, in ms |
+| `sensitivity` | `1` | Microphone sensitivity, from `0.1` to `5` |
+| `speed` | `1` | Animation speed (`0` freezes it) |
+| `quality` | `auto` | Canvas resolution: `low`, `medium`, `high` |
+| `interactive` | `true` | `false`: clicking does not toggle the microphone (control it from code) |
+| `simulate` | — | Fake speech while idle — handy for previews |
+| `show-errors` | — | Show problems (no mic access, no speech service) as text. By default they only go to the console |
 
-Пока идёт запись, у элемента есть атрибут `listening`. По нему можно стилизовать окружение: `speak-louder-sphere[listening] { … }`.
+Example:
 
-## Цвета
+```html
+<speak-louder-sphere preset="aurora" size="280" lang="es-ES" text="¡Hola! Tócame y habla."></speak-louder-sphere>
+```
 
-| Роль | Где видна | `nova` |
+### Colors
+
+Each preset is five colors. Override any of them:
+
+| Role | Where you see it | `nova` |
 |---|---|---|
-| `deep` | тёмное тело стекла (оставляйте тёмным) | `#07154a` |
-| `body` | верхняя сторона мембраны, глубина свечения | `#2f6bff` |
-| `glow` | яркая нижняя сторона и линия сгиба | `#3fe6ff` |
-| `accent` | перелив на верхней стороне справа | `#9747ff` |
-| `rim` | край стекла | `#5f9dff` |
+| `deep` | the dark glass (keep it dark) | `#07154a` |
+| `body` | the top of the glowing sheet | `#2f6bff` |
+| `glow` | the bright underside and the fold | `#3fe6ff` |
+| `accent` | the tint on top | `#9747ff` |
+| `rim` | the edge of the glass | `#5f9dff` |
 
 ```html
 <speak-louder-sphere preset="sunset" color-glow="#ffd166"></speak-louder-sphere>
 ```
 
-```js
-sphere.setColors({ glow: '#00ffa3', accent: '#00b3ff' }); // на лету
-sphere.setColors(null);                                   // вернуть пресет и атрибуты
-```
+### Caption style
 
-## Оформление субтитров (CSS)
-
-Субтитры наследуют шрифт и цвет страницы. Подстроить можно через переменные:
+Captions use your page's font and color. Tune them with CSS variables:
 
 ```css
 speak-louder-sphere {
-  --sls-size: 360px;                 /* диаметр сферы */
-  --sls-gap: 48px;                   /* расстояние от сферы до текста */
+  --sls-size: 360px;              /* sphere diameter */
+  --sls-gap: 48px;                /* space between the sphere and the text */
   --sls-font-family: "Inter", sans-serif;
   --sls-font-size: 24px;
-  --sls-font-weight: 400;
   --sls-caption-color: #fff;
-  --sls-interim-opacity: 0.55;       /* ещё не подтверждённые слова */
-  --sls-caption-max-width: 36em;
-  --sls-error-color: #ff8a8a;
+  --sls-interim-opacity: 0.55;    /* words that are not confirmed yet */
 }
-speak-louder-sphere::part(caption) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6); }
 ```
 
-Доступные `::part`: `root`, `stage`, `glow`, `canvas`, `button`, `caption`.
+For full control use `::part(caption)`. Other parts: `root`, `stage`, `glow`, `canvas`, `button`.
 
-## JS API
+## JavaScript API
 
 ```js
 const sphere = document.querySelector('speak-louder-sphere');
 
-await sphere.start();        // включить микрофон и субтитры (вернёт false, если доступ не дали)
-sphere.stop();               // выключить
-await sphere.toggle();
-sphere.listening;            // true, пока идёт запись
-sphere.level;                // текущая громкость 0..1
+await sphere.start();   // turn the microphone and captions on
+sphere.stop();          // turn them off
+sphere.listening;       // true while the microphone is on
 
-// Сфера «говорит» голосом ассистента (TTS из <audio>, файл с того же домена или с CORS)
-sphere.connectMediaElement(audioElement);
-// …или любым MediaStream (например, удалённый голос в WebRTC)
-sphere.connectStream(stream);
-// …или своими значениями громкости
-sphere.setLevel(0.7);
-
-sphere.setCaption('Текст ответа ассистента');   // показать свой текст (null — убрать)
-sphere.pushTranscript({ interim: 'привет как' }); // свой сервис распознавания: гипотеза
-sphere.pushTranscript({ final: 'привет как дела' }); // …и итоговый текст
-sphere.simulate(true);                            // имитация речи без микрофона
+sphere.setColors({ glow: '#00ffa3' });   // change colors on the fly
+sphere.setCaption('Any text you like');  // show your own text
+sphere.simulate(true);                   // fake speech, no microphone needed
 ```
 
-Ошибки не показываются на странице: они пишутся в консоль браузера (`[speak-louder-sphere] …`) и приходят событием `sls-error`.
+**Make it speak with your assistant's voice.** Connect any `<audio>` element (for example, text-to-speech) and the sphere moves with the sound:
 
-События всплывают и проходят через Shadow DOM:
+```js
+const reply = new Audio('/reply.mp3');
+sphere.connectMediaElement(reply);
+sphere.setCaption('Here is what I found for you.');
+reply.play();
+```
 
-| Событие | `detail` |
-|---|---|
-| `sls-start` / `sls-stop` | `{ source }`: микрофон включён или выключен |
-| `sls-transcript` | `{ text, final, interim, isFinal }`: текущая фраза, новый итоговый кусок, гипотеза |
-| `sls-error` | `{ code, message }`: например `mic-NotAllowedError`, `speech-network`, `speech-unsupported` |
-| `sls-sourcechange` | `{ source }`: `none`, `microphone`, `stream`, `element`, `simulation`, `manual` |
+Remote voices work too: `sphere.connectStream(mediaStream)`. Or drive it yourself with `sphere.setLevel(0..1)`.
 
-Пример: отправить сказанное в свой бэкенд или LLM.
+**Send what the user said to your backend:**
 
 ```js
 sphere.addEventListener('sls-transcript', (e) => {
@@ -163,45 +147,58 @@ sphere.addEventListener('sls-transcript', (e) => {
 });
 ```
 
-## Браузеры
+**Use your own speech-to-text** (Whisper, Deepgram, …) and show it as captions:
 
-| | Сфера и реакция на голос | Живые субтитры |
+```js
+sphere.pushTranscript({ interim: 'hello wor' });   // live guess, may change
+sphere.pushTranscript({ final: 'hello world' });   // confirmed text
+```
+
+### Events
+
+| Event | `detail` |
+|---|---|
+| `sls-start` / `sls-stop` | the microphone was turned on / off |
+| `sls-transcript` | `{ text, final, interim, isFinal }` — the current phrase |
+| `sls-error` | `{ code, message }`, e.g. `mic-NotAllowedError`, `speech-network` |
+| `sls-sourcechange` | `{ source }`: `none`, `microphone`, `stream`, `element`, `simulation`, `manual` |
+
+## Browser support
+
+| | Sphere and voice reaction | Live captions |
 |---|---|---|
-| Chrome, Edge (компьютер, Android) | ✅ | ✅ |
-| Safari (macOS, iOS) | ✅ | ✅ |
-| Firefox | ✅ | ❌ (предупреждение в консоли) |
+| Chrome, Edge (desktop and Android) | ✅ | ✅ |
+| Safari (macOS and iOS) | ✅ | ✅ |
+| Firefox | ✅ | — |
 
-- Субтитры построены на встроенном в браузер Web Speech API. Chrome и Edge отправляют звук на свои серверы распознавания, поэтому нужен интернет.
-- Если нужна офлайн-обработка, другая точность или один движок во всех браузерах (Whisper, Deepgram, Yandex SpeechKit и т. п.), подключите свой сервис через `pushTranscript()`. Сфера и субтитры будут работать так же.
-- Без WebGL показывается упрощённая CSS-версия сферы.
+Captions use the speech recognition built into the browser (the Web Speech API). Chrome and Edge send the audio to their cloud services, so they need an internet connection. Some Chromium-based browsers don't provide this service at all.
 
-## Структура
+Need captions everywhere, or offline? Connect any speech-to-text with `pushTranscript()` — the sphere and captions work the same way.
+
+## Development
+
+```bash
+npm install
+npm run dev          # demo with hot reload at http://localhost:5173
+npm run build        # the widget -> dist/
+npm run build:site   # demo site -> site/ (this is what Vercel deploys)
+```
 
 ```
 src/
-  index.ts      точка входа: регистрация элемента, createSphere()
-  element.ts    веб-компонент <speak-louder-sphere>
-  shaders.ts    GLSL: мембрана, стекло, ореол
-  renderer.ts   WebGL-рендер
-  audio.ts      анализ микрофона/аудио: громкость и частоты
-  speech.ts     Web Speech API с автоперезапуском
-  captions.ts   субтитры с анимацией слов
-  colors.ts     пресеты и разбор цветов
-  simulator.ts  имитация речи
-demo/           демо-страница с настройками (index.html)
-examples/       примеры встраивания
-dist/           готовые файлы для сайта
+  element.ts    the <speak-louder-sphere> element
+  shaders.ts    the sphere (WebGL)
+  audio.ts      loudness and frequencies from the microphone or any audio
+  speech.ts     live speech recognition (Web Speech API)
+  captions.ts   word-by-word captions
+  colors.ts     presets and color parsing
+demo/           the demo page with the Customize panel
+examples/       embed examples
+dist/           ready-to-use files
 ```
 
-## Скрипты
+Every push to `main` deploys the demo to [speak-louder-sphere.vercel.app](https://speak-louder-sphere.vercel.app).
 
-| Команда | Что делает |
-|---|---|
-| `npm run dev` | демо с горячей перезагрузкой |
-| `npm run build` | проверка типов и сборка `dist/` (ES-модуль, файл для `<script>`, типы) |
-| `npm run build:site` | сборка сайта (демо, примеры и файлы виджета) в `site/` — её выполняет Vercel |
-| `npm run typecheck` | только проверка типов |
+## License
 
-## Публикация
-
-Проект подключён к Vercel (`likemiens-projects/speak-louder-sphere`): каждый push в `main` сам пересобирает и публикует <https://speak-louder-sphere.vercel.app>. Настройки сборки — в `vercel.json`.
+[MIT](LICENSE) © Likemiens

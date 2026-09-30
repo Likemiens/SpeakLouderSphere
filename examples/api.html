@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -18,20 +18,20 @@
   </head>
   <body>
     <main>
-      <speak-louder-sphere id="sphere" lang="ru-RU" text="Управляйте сферой кнопками справа" listening-text="Слушаю…"></speak-louder-sphere>
+      <speak-louder-sphere id="sphere" lang="en-US" text="Control the sphere with the buttons on the right" listening-text="Listening…"></speak-louder-sphere>
     </main>
     <aside>
-      <h2>Микрофон</h2>
-      <button id="start">sphere.start() — включить микрофон</button>
-      <button id="stop">sphere.stop() — выключить</button>
-      <h2>Без микрофона</h2>
-      <button id="simulate">sphere.simulate() — имитация речи</button>
-      <button id="reply">setCaption() + setLevel() — «ответ ассистента»</button>
-      <button id="stt">pushTranscript() — свой сервис распознавания</button>
-      <h2>Цвета</h2>
+      <h2>Microphone</h2>
+      <button id="start">sphere.start() — turn the microphone on</button>
+      <button id="stop">sphere.stop() — turn it off</button>
+      <h2>Without a microphone</h2>
+      <button id="simulate">sphere.simulate() — fake speech</button>
+      <button id="reply">setCaption() + setLevel() — “assistant reply”</button>
+      <button id="stt">pushTranscript() — your own speech-to-text</button>
+      <h2>Colors</h2>
       <button id="colors">setColors({ glow, accent })</button>
-      <button id="reset">setColors(null) — вернуть пресет</button>
-      <h2>События</h2>
+      <button id="reset">setColors(null) — back to the preset</button>
+      <h2>Events</h2>
       <pre id="log"></pre>
     </aside>
 
@@ -57,7 +57,7 @@
       // sphere "speaks" with a made-up loudness envelope. With real TTS audio use
       // sphere.connectMediaElement(audioElement) instead of setLevel().
       on('reply', () => {
-        sphere.setCaption('Конечно! Вот что я нашла по вашему запросу.');
+        sphere.setCaption('Sure! Here is what I found for you.');
         const t0 = performance.now();
         const tick = (now) => {
           const t = (now - t0) / 1000;
@@ -70,7 +70,7 @@
 
       // Plugging in any external speech-to-text: send interim hypotheses, then the final text.
       on('stt', () => {
-        const words = 'так выглядят живые субтитры от внешнего сервиса распознавания речи'.split(' ');
+        const words = 'this is how live captions from an external speech service look'.split(' ');
         words.forEach((_, i) => setTimeout(() => {
           const last = i === words.length - 1;
           const text = words.slice(0, i + 1).join(' ');

@@ -71,7 +71,7 @@ vec3 toSRGB(vec3 c) {
 vec3 tonemap(vec3 c) {
   c *= 1.25;
   float m = max(c.r, max(c.g, c.b));
-  return c * ((1.0 - exp(-m)) / max(m, 1e-5)) + max(m - 1.2, 0.0) * 0.15;
+  return c * ((1.0 - exp(-m)) / max(m, 1e-5)) + max(m - 1.3, 0.0) * 0.06;
 }
 
 void main() {

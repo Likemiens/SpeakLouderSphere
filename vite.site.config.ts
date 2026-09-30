@@ -9,6 +9,7 @@ const copyWidgetAndExamples = (): Plugin => ({
   closeBundle() {
     cpSync('dist', 'site/dist', { recursive: true });
     cpSync('examples', 'site/examples', { recursive: true });
+    cpSync('docs/cover.png', 'site/og.png'); // link preview image (Open Graph / Twitter card)
   },
 });
 

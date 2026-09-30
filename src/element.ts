@@ -668,7 +668,7 @@ export class SpeakLouderSphereElement extends HTMLElement {
       amp: 0.3 + 0.05 * Math.sin(0.37 * T) + 0.12 * f.level + 0.06 * f.low,
       offset: -0.05 + 0.1 * Math.sin(0.29 * T + 0.4),
       ripple: 0.045 * f.high + 0.012 * f.level,
-      energy: (0.94 + 0.06 * Math.sin(wall * 1.3)) * (1 + 0.3 * f.level + 0.1 * f.mid) * (1 + 0.08 * this.listen + 0.08 * this.hover),
+      energy: (0.94 + 0.06 * Math.sin(wall * 1.3)) * (1 + 0.24 * f.level + 0.08 * f.mid) * (1 + 0.08 * this.listen + 0.08 * this.hover),
       radius: pulseScale / CANVAS_SCALE,
     });
   }

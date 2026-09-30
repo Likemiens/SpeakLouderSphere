@@ -3,13 +3,110 @@ import { COLOR_ROLES, PRESETS, type ColorRole, type PresetName } from '../src/in
 const sphere = document.getElementById('sphere')!;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
-const ROLE_LABELS: Record<ColorRole, [string, string]> = {
-  deep: ['Стекло', 'тёмная основа'],
-  body: ['Основной', 'верх мембраны'],
-  glow: ['Свечение', 'низ мембраны и сгиб'],
-  accent: ['Акцент', 'перелив сверху'],
-  rim: ['Ободок', 'край стекла и ореол'],
+// ---- Interface language (English by default, Russian on demand) -------------
+
+const UI = {
+  en: {
+    title: 'SpeakLouderSphere — voice-reactive sphere with live captions',
+    langGroup: 'Interface language',
+    customize: 'Customize',
+    settings: 'Settings',
+    close: 'Close',
+    preset: 'Preset',
+    colors: 'Colors',
+    resetColors: 'Reset to preset',
+    behavior: 'Behavior',
+    size: 'Size',
+    sensitivity: 'Microphone sensitivity',
+    speed: 'Animation speed',
+    speechLang: 'Speech recognition language',
+    captions: 'Captions under the sphere',
+    simulate: 'Simulate speech (no microphone)',
+    texts: 'Texts',
+    textIdle: 'When the microphone is off',
+    textListening: 'While listening',
+    background: 'Page background',
+    bgBlack: 'Black',
+    bgNavy: 'Dark blue',
+    bgLight: 'Light',
+    embed: 'Embed code',
+    copy: 'Copy',
+    copied: 'Copied ✓',
+    copyFailed: 'Select the code and copy it manually',
+    greeting: 'Hi! Tap the sphere and start talking',
+    listening: 'Listening…',
+    speech: 'en-US',
+    roles: {
+      deep: ['Glass', 'dark body'],
+      body: ['Body', 'top of the sheet'],
+      glow: ['Glow', 'underside and fold'],
+      accent: ['Accent', 'tint on top'],
+      rim: ['Rim', 'edge of the glass'],
+    } as Record<ColorRole, [string, string]>,
+  },
+  ru: {
+    title: 'SpeakLouderSphere — сфера, которая слушает и показывает субтитры',
+    langGroup: 'Язык интерфейса',
+    customize: 'Настроить',
+    settings: 'Настройки',
+    close: 'Закрыть',
+    preset: 'Пресет',
+    colors: 'Цвета',
+    resetColors: 'Сбросить к пресету',
+    behavior: 'Поведение',
+    size: 'Размер',
+    sensitivity: 'Чувствительность микрофона',
+    speed: 'Скорость анимации',
+    speechLang: 'Язык распознавания',
+    captions: 'Субтитры под сферой',
+    simulate: 'Имитация речи (без микрофона)',
+    texts: 'Тексты',
+    textIdle: 'Когда микрофон выключен',
+    textListening: 'Пока слушает',
+    background: 'Фон страницы',
+    bgBlack: 'Чёрный',
+    bgNavy: 'Тёмно-синий',
+    bgLight: 'Светлый',
+    embed: 'Код для сайта',
+    copy: 'Скопировать',
+    copied: 'Скопировано ✓',
+    copyFailed: 'Выделите код и скопируйте вручную',
+    greeting: 'Привет! Нажми на сферу и начни говорить',
+    listening: 'Говорите, я слушаю…',
+    speech: 'ru-RU',
+    roles: {
+      deep: ['Стекло', 'тёмная основа'],
+      body: ['Основной', 'верх мембраны'],
+      glow: ['Свечение', 'низ мембраны и сгиб'],
+      accent: ['Акцент', 'перелив сверху'],
+      rim: ['Ободок', 'край стекла'],
+    } as Record<ColorRole, [string, string]>,
+  },
 };
+type UiLang = keyof typeof UI;
+type UiKey = Exclude<keyof (typeof UI)['en'], 'roles'>;
+
+const storage = {
+  get(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  set(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      /* private mode etc. */
+    }
+  },
+};
+
+const isUiLang = (v: string | null): v is UiLang => v === 'en' || v === 'ru';
+const fromUrl = new URLSearchParams(location.search).get('lang');
+let uiLang: UiLang = isUiLang(fromUrl) ? fromUrl : isUiLang(storage.get('sls-ui-lang')) ? (storage.get('sls-ui-lang') as UiLang) : 'en';
+const t = (key: UiKey) => UI[uiLang][key];
 
 const PRESET_LABELS: Record<PresetName, string> = {
   nova: 'Nova',
@@ -21,14 +118,7 @@ const PRESET_LABELS: Record<PresetName, string> = {
   mono: 'Mono',
 };
 
-const DEFAULTS = {
-  size: '340',
-  sensitivity: '1',
-  speed: '1',
-  lang: 'ru-RU',
-  text: 'Привет! Нажми на сферу и начни говорить',
-  listeningText: 'Говорите, я слушаю…',
-};
+const DEFAULTS = { size: '340', sensitivity: '1', speed: '1' };
 
 let preset: PresetName = 'nova';
 let colors: Record<ColorRole, string> = { ...PRESETS.nova };
@@ -79,10 +169,11 @@ for (const name of Object.keys(PRESETS) as PresetName[]) {
 const colorsEl = $('colors');
 const colorInputs = {} as Record<ColorRole, HTMLInputElement>;
 const colorCodes = {} as Record<ColorRole, HTMLElement>;
+const colorLabels = {} as Record<ColorRole, [HTMLElement, HTMLElement]>;
 for (const role of COLOR_ROLES) {
   const row = document.createElement('label');
   row.className = 'color-row';
-  row.innerHTML = `<input type="color" /><span class="label">${ROLE_LABELS[role][0]}<span class="hint">${ROLE_LABELS[role][1]}</span></span><code></code>`;
+  row.innerHTML = `<input type="color" /><span class="label"><span class="name"></span><span class="hint"></span></span><code></code>`;
   const input = row.querySelector('input')!;
   input.addEventListener('input', () => {
     colors[role] = input.value;
@@ -90,6 +181,7 @@ for (const role of COLOR_ROLES) {
   });
   colorInputs[role] = input;
   colorCodes[role] = row.querySelector('code')!;
+  colorLabels[role] = [row.querySelector('.name')!, row.querySelector('.hint')!];
   colorsEl.appendChild(row);
 }
 $('reset-colors').addEventListener('click', () => {
@@ -107,8 +199,6 @@ const captions = $<HTMLInputElement>('captions');
 const simulate = $<HTMLInputElement>('simulate');
 const text = $<HTMLInputElement>('text');
 const listeningText = $<HTMLInputElement>('listening-text');
-text.value = DEFAULTS.text;
-listeningText.value = DEFAULTS.listeningText;
 
 for (const el of [size, sensitivity, speed, lang, captions, simulate, text, listeningText]) {
   el.addEventListener('input', apply);
@@ -125,6 +215,36 @@ for (const btn of bgButtons) {
     document.documentElement.style.setProperty('--fg', btn.dataset.fg!);
     bgButtons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
   });
+}
+
+// ---- Language switch -----------------------------------------------------------
+
+const langButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-ui-lang]')];
+for (const btn of langButtons) btn.addEventListener('click', () => setUiLang(btn.dataset.uiLang as UiLang));
+
+function setUiLang(next: UiLang, initial = false): void {
+  const prev = UI[uiLang];
+  uiLang = next;
+  const dict = UI[next];
+  document.documentElement.lang = next;
+  document.title = dict.title;
+  document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
+    el.textContent = dict[el.dataset.i18n as UiKey];
+  });
+  document.querySelectorAll<HTMLElement>('[data-i18n-aria]').forEach((el) => {
+    el.setAttribute('aria-label', dict[el.dataset.i18nAria as UiKey]);
+  });
+  for (const role of COLOR_ROLES) {
+    colorLabels[role][0].textContent = dict.roles[role][0];
+    colorLabels[role][1].textContent = dict.roles[role][1];
+  }
+  langButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.uiLang === next)));
+  // Texts and recognition language follow the interface unless they were customised.
+  if (initial || !text.value || text.value === prev.greeting) text.value = dict.greeting;
+  if (initial || !listeningText.value || listeningText.value === prev.listening) listeningText.value = dict.listening;
+  if (initial || lang.value === prev.speech) lang.value = dict.speech;
+  storage.set('sls-ui-lang', next);
+  apply();
 }
 
 // ---- Apply + snippet ---------------------------------------------------------
@@ -185,12 +305,12 @@ $('copy').addEventListener('click', async () => {
   const btn = $<HTMLButtonElement>('copy');
   try {
     await navigator.clipboard.writeText(snippet());
-    btn.textContent = 'Скопировано ✓';
+    btn.textContent = t('copied');
   } catch {
-    btn.textContent = 'Выделите код и скопируйте вручную';
+    btn.textContent = t('copyFailed');
   }
-  setTimeout(() => (btn.textContent = 'Скопировать'), 1800);
+  setTimeout(() => (btn.textContent = t('copy')), 1800);
 });
 
 size.value = DEFAULTS.size;
-apply();
+setUiLang(uiLang, true);

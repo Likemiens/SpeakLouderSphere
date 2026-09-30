@@ -1,10 +1,18 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
-    <title>SpeakLouderSphere — демо и настройка</title>
+    <title>SpeakLouderSphere — voice-reactive sphere with live captions</title>
+    <meta name="description" content="A glowing sphere that reacts to your voice and shows live captions of what you say. Open-source web component: one tag on any website." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://speak-louder-sphere.vercel.app/" />
+    <meta property="og:title" content="SpeakLouderSphere" />
+    <meta property="og:description" content="A glowing sphere that reacts to your voice and shows live captions. One tag on any website." />
+    <meta property="og:image" content="https://speak-louder-sphere.vercel.app/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://speak-louder-sphere.vercel.app/og.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,92 +20,99 @@
   </head>
   <body>
     <header class="topbar">
-      <span class="brand">SpeakLouderSphere</span>
-      <button class="pill" id="open-panel" type="button" aria-expanded="false" aria-controls="panel">Настроить</button>
+      <a class="brand" href="https://github.com/Likemiens/SpeakLouderSphere" target="_blank" rel="noopener">SpeakLouderSphere</a>
+      <div class="actions">
+        <div class="lang-switch" role="group" data-i18n-aria="langGroup" aria-label="Interface language">
+          <button type="button" data-ui-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-ui-lang="ru" aria-pressed="false">RU</button>
+        </div>
+        <button class="pill" id="open-panel" type="button" aria-expanded="false" aria-controls="panel" data-i18n="customize">Customize</button>
+      </div>
     </header>
 
     <main class="stage">
       <speak-louder-sphere
         id="sphere"
-        lang="ru-RU"
-        text="Привет! Нажми на сферу и начни говорить"
-        listening-text="Говорите, я слушаю…"
+        lang="en-US"
+        text="Hi! Tap the sphere and start talking"
+        listening-text="Listening…"
       ></speak-louder-sphere>
     </main>
 
-
-    <aside class="panel" id="panel" aria-label="Настройки сферы" hidden>
+    <aside class="panel" id="panel" data-i18n-aria="settings" aria-label="Settings" hidden>
       <div class="panel-head">
-        <h2>Настройки</h2>
-        <button class="icon-btn" id="close-panel" type="button" aria-label="Закрыть">✕</button>
+        <h2 data-i18n="settings">Settings</h2>
+        <button class="icon-btn" id="close-panel" type="button" data-i18n-aria="close" aria-label="Close">✕</button>
       </div>
 
       <section>
-        <h3>Пресет</h3>
-        <div class="presets" id="presets" role="radiogroup" aria-label="Пресет"></div>
+        <h3 data-i18n="preset">Preset</h3>
+        <div class="presets" id="presets" role="radiogroup" data-i18n-aria="preset" aria-label="Preset"></div>
       </section>
 
       <section>
-        <h3>Цвета</h3>
+        <h3 data-i18n="colors">Colors</h3>
         <div class="colors" id="colors"></div>
-        <button class="link-btn" id="reset-colors" type="button">Сбросить к пресету</button>
+        <button class="link-btn" id="reset-colors" type="button" data-i18n="resetColors">Reset to preset</button>
       </section>
 
       <section>
-        <h3>Поведение</h3>
+        <h3 data-i18n="behavior">Behavior</h3>
         <label class="field">
-          <span>Размер <output id="size-out"></output></span>
+          <span><span data-i18n="size">Size</span> <output id="size-out"></output></span>
           <input type="range" id="size" min="160" max="560" step="10" value="340" />
         </label>
         <label class="field">
-          <span>Чувствительность микрофона <output id="sensitivity-out"></output></span>
+          <span><span data-i18n="sensitivity">Microphone sensitivity</span> <output id="sensitivity-out"></output></span>
           <input type="range" id="sensitivity" min="0.3" max="3" step="0.1" value="1" />
         </label>
         <label class="field">
-          <span>Скорость анимации <output id="speed-out"></output></span>
+          <span><span data-i18n="speed">Animation speed</span> <output id="speed-out"></output></span>
           <input type="range" id="speed" min="0" max="3" step="0.1" value="1" />
         </label>
         <label class="field">
-          <span>Язык распознавания</span>
+          <span data-i18n="speechLang">Speech recognition language</span>
           <select id="lang">
-            <option value="ru-RU">Русский</option>
             <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="ru-RU">Русский</option>
             <option value="uk-UA">Українська</option>
-            <option value="kk-KZ">Қазақ тілі</option>
             <option value="de-DE">Deutsch</option>
             <option value="es-ES">Español</option>
             <option value="fr-FR">Français</option>
+            <option value="pt-BR">Português (Brasil)</option>
+            <option value="ja-JP">日本語</option>
           </select>
         </label>
-        <label class="switch"><input type="checkbox" id="captions" checked /> <span>Субтитры под сферой</span></label>
-        <label class="switch"><input type="checkbox" id="simulate" /> <span>Имитация речи (без микрофона)</span></label>
+        <label class="switch"><input type="checkbox" id="captions" checked /> <span data-i18n="captions">Captions under the sphere</span></label>
+        <label class="switch"><input type="checkbox" id="simulate" /> <span data-i18n="simulate">Simulate speech (no microphone)</span></label>
       </section>
 
       <section>
-        <h3>Тексты</h3>
+        <h3 data-i18n="texts">Texts</h3>
         <label class="field">
-          <span>Когда микрофон выключен</span>
+          <span data-i18n="textIdle">When the microphone is off</span>
           <input type="text" id="text" />
         </label>
         <label class="field">
-          <span>Пока слушает</span>
+          <span data-i18n="textListening">While listening</span>
           <input type="text" id="listening-text" />
         </label>
       </section>
 
       <section>
-        <h3>Фон страницы</h3>
+        <h3 data-i18n="background">Page background</h3>
         <div class="backgrounds" id="backgrounds">
-          <button type="button" data-bg="#000000" data-fg="#ffffff" aria-label="Чёрный" aria-pressed="true"></button>
-          <button type="button" data-bg="#0b1020" data-fg="#e8ecff" aria-label="Тёмно-синий"></button>
-          <button type="button" data-bg="#f4f5f8" data-fg="#10131a" aria-label="Светлый"></button>
+          <button type="button" data-bg="#000000" data-fg="#ffffff" data-i18n-aria="bgBlack" aria-label="Black" aria-pressed="true"></button>
+          <button type="button" data-bg="#0b1020" data-fg="#e8ecff" data-i18n-aria="bgNavy" aria-label="Dark blue"></button>
+          <button type="button" data-bg="#f4f5f8" data-fg="#10131a" data-i18n-aria="bgLight" aria-label="Light"></button>
         </div>
       </section>
 
       <section>
-        <h3>Код для сайта</h3>
+        <h3 data-i18n="embed">Embed code</h3>
         <pre class="code"><code id="snippet"></code></pre>
-        <button class="pill wide" id="copy" type="button">Скопировать</button>
+        <button class="pill wide" id="copy" type="button" data-i18n="copy">Copy</button>
       </section>
     </aside>
 

@@ -1,7 +1,17 @@
 {
   "name": "speak-louder-sphere",
   "version": "0.1.0",
-  "description": "Voice-reactive glowing glass sphere with live speech captions. Drop-in Web Component (WebGL + Web Audio + Web Speech API).",
+  "description": "A glowing sphere that reacts to your voice and shows live captions. Drop-in Web Component (WebGL + Web Audio + Web Speech API).",
+  "license": "MIT",
+  "author": "Likemiens",
+  "homepage": "https://speak-louder-sphere.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Likemiens/SpeakLouderSphere.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Likemiens/SpeakLouderSphere/issues"
+  },
   "type": "module",
   "private": true,
   "main": "./dist/speak-louder-sphere.js",
@@ -19,11 +29,15 @@
   ],
   "keywords": [
     "web-component",
+    "custom-element",
     "webgl",
     "voice",
     "speech-recognition",
+    "live-captions",
     "audio-visualizer",
     "orb",
+    "siri",
+    "ai-assistant",
     "widget"
   ],
   "scripts": {

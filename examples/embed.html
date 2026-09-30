@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SpeakLouderSphere — встраивание одним тегом</title>
+    <title>SpeakLouderSphere — embed with one tag</title>
     <style>
       html, body { margin: 0; height: 100%; background: #000; color: #fff; }
       body {
@@ -15,15 +15,15 @@
     </style>
   </head>
   <body>
-    <!-- 1. Один файл, без зависимостей. На своём сайте укажите путь к скопированному файлу. -->
+    <!-- 1. One file, no dependencies. On your own site use the hosted URL or your own copy. -->
     <script src="../dist/speak-louder-sphere.iife.js"></script>
 
-    <!-- 2. Сам виджет — вставляется в любое место страницы. -->
+    <!-- 2. The widget itself: put it anywhere on the page. -->
     <speak-louder-sphere
       size="380"
-      lang="ru-RU"
-      text="Привет! Я NOVA, проводник в Миссию 2027"
-      listening-text="Слушаю…"
+      lang="en-US"
+      text="Hi! I'm a talking sphere. Tap me and say something."
+      listening-text="Listening…"
     ></speak-louder-sphere>
   </body>
 </html>
